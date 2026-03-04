@@ -11,9 +11,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...(options.headers as Record<string, string>),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
-
-  const response = await fetch(`${BASE_URL}${path}`, { ...options, headers });
-
+  const requestUrl = `${BASE_URL}${path}`;
+  console.debug(`API Request: method=${options.method ?? 'GET'} url=${requestUrl}`);
+  const response = await fetch(requestUrl, { ...options, headers });
+  console.debug(`API Response: url=${requestUrl} status=${response.status}`);
   if (!response.ok) {
     let body: ApiErrorBody = {};
     try {
@@ -32,7 +33,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export const api = {
   get: <T>(path: string) => request<T>(path),
-  post: <T>(path: string, body: unknown) => request<T>(path, { method: 'POST',  body: JSON.stringify(body) }),
+  post: <T>(path: string, body: unknown) => request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
   patch: <T>(path: string, body: unknown) => request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }),
   delete: (path: string) => request<void>(path, { method: 'DELETE' }),
 };
