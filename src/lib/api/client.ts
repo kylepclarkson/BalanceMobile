@@ -17,6 +17,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   console.debug(`API Response: url=${requestUrl} status=${response.status}`);
   if (!response.ok) {
     let body: ApiErrorBody = {};
+    console.debug(`API Error Response: url=${requestUrl} status=${response.status} body=`, response);
     try {
       body = await response.json();
     } catch {

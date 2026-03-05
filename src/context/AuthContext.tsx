@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { api, TOKEN_KEYS } from '@/lib/api';
 
 type LoginCredentials = { email: string; password: string };
+type SignupCredentials = { email: string; password: string; };
 type LoginResponse = { meta: { access_token: string; refresh_token: string } };
 type RefreshResponse = { meta: { access_token: string } };
 
@@ -11,6 +12,7 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
+  signup: (credentials: SignupCredentials) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -58,6 +60,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticated(true);
   }, []);
 
+  const signup = useCallback(async (credentials: SignupCredentials) => {
+    const data = await api.post<LoginResponse>('/api/v1/auth/signup', credentials);
+    await SecureStore.setItemAsync(TOKEN_KEYS.ACCESS, data.meta.access_token);
+    await SecureStore.setItemAsync(TOKEN_KEYS.REFRESH, data.meta.refresh_token);
+    setIsAuthenticated(true);
+  }, []);
+
   const logout = useCallback(async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEYS.ACCESS);
     await SecureStore.deleteItemAsync(TOKEN_KEYS.REFRESH);
@@ -65,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

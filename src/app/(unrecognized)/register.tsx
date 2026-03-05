@@ -4,22 +4,36 @@ import { useRouter } from 'expo-router';
 
 import { useAuth } from '@/context/AuthContext';
 
-export default function LoginScreen() {
-  const { login } = useAuth();
+export default function RegisterScreen() {
+  const { signup } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function handleLogin() {
+  async function handleRegister() {
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
-      await login({ email, password });
+      // TODO add additional validation. 
+      if (!email || !password) {
+        setError('Email and password are required');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+      await signup({ email, password: password });
       // No manual navigation needed — Stack.Protected reacts to isAuthenticated change
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Login failed');
+      setError(e instanceof Error ? e.message : 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -27,7 +41,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Sign In</Text>
+      <Text style={styles.heading}>Create Account</Text>
       {error && <Text style={styles.error}>{error}</Text>}
       <TextInput
         style={styles.input}
@@ -44,12 +58,19 @@ export default function LoginScreen() {
         value={password}
         onChangeText={setPassword}
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        secureTextEntry
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+      />
       {loading ? (
         <ActivityIndicator />
       ) : (
-        <Button title="Log In" onPress={handleLogin} />
+        <Button title="Create Account" onPress={handleRegister} />
       )}
-      <Button title="Create account" onPress={() => router.push('/register')} />
+      <Button title="Already have an account? Sign in" onPress={() => router.back()} />
     </View>
   );
 }
