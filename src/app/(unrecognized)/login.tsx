@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Button, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/design-system/Button';
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -26,11 +27,11 @@ export default function LoginScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Sign In</Text>
-      {error && <Text style={styles.error}>{error}</Text>}
+    <View className="flex-1 justify-center p-6">
+      <Text className="mb-6 text-center text-2xl font-bold">Sign In</Text>
+      {error && <Text className="mb-3 text-center text-red-500">{error}</Text>}
       <TextInput
-        style={styles.input}
+        className="mb-3 w-full rounded-lg border border-gray-300 p-3"
         placeholder="Email"
         autoCapitalize="none"
         keyboardType="email-address"
@@ -38,32 +39,14 @@ export default function LoginScreen() {
         onChangeText={setEmail}
       />
       <TextInput
-        style={styles.input}
+        className="mb-3 w-full rounded-lg border border-gray-300 p-3"
         placeholder="Password"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
       />
-      {loading ? (
-        <ActivityIndicator />
-      ) : (
-        <Button title="Log In" onPress={handleLogin} />
-      )}
-      <Button title="Create account" onPress={() => router.push('/register')} />
+      <Button title="Log In" onPress={handleLogin} loading={loading} className="mb-2" />
+      <Button title="Create account" variant="ghost" onPress={() => router.push('/register')} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  heading: { fontSize: 24, fontWeight: 'bold', marginBottom: 24 },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-  },
-  error: { color: 'red', marginBottom: 12 },
-});
