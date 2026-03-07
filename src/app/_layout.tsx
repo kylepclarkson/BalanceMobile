@@ -20,10 +20,10 @@ function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={isAuthenticated}>
-        <Stack.Screen name="(recognized)" />
+        <Stack.Screen name="(authenticated)" />
       </Stack.Protected>
       <Stack.Protected guard={!isAuthenticated}>
-        <Stack.Screen name="(unrecognized)" />
+        <Stack.Screen name="(unauthenticated)" />
       </Stack.Protected>
     </Stack>
   );
